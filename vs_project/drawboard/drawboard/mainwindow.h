@@ -2,9 +2,11 @@
 #define MAINWINDOW_H
 #include <QtWidgets\qmainwindow.h>
 #include <QtGui\qevent.h>
-#include <Windows.h>
-#include "pluginloader.h"
 #include "shape.h"
+#include "pluginloader.h"
+#include "file.h"
+
+
 
 class Shape;
 
@@ -17,7 +19,7 @@ class MainWindow :public QMainWindow {
 
 public:
 	MainWindow();
-	~MainWindow();
+    ~MainWindow();
 
 private:
 	vector<string> dll_names; // DLL 文件的绝对路径
@@ -31,7 +33,8 @@ private:
 	int curProcNo = -1; // 当前函数指针列表的编号, 由 slot getShapeInstance() 设置, 以便鼠标释放后调用函数完成深拷贝
 	int shapeDragedNo = -1; // 需要拖拽的 shape 在 shapeList 中的编号
 	bool fDrag = false; // 是否处在拖动模式
-	int mouseReleasedCount = 0;
+
+	File *myFile;
 
 	void setSize(int width, int height);
 	void createMenusAndLoadplugins();
@@ -44,6 +47,8 @@ private slots:
 	void getShapeInstance();
 	void setDrag();
 	void clear(); // 清屏
+	void saveFile();
+	void openFile();
 };
 
 #endif // MAINWINDOW_H

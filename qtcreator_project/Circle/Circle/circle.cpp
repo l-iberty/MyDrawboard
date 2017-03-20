@@ -78,6 +78,11 @@ void Circle::setP2(QPoint &point) {
     this->p2 = new QPoint(point);
 }
 
+QString Circle::getDllModName() {
+    QString name("Circle.dll");
+    return name;
+}
+
 /***************************************************************
  * 以下导出函数不能作为类的成员
  * *************************************************************/

@@ -77,6 +77,11 @@ void Line::getArgs(PLINEARGS pArgs) {
     pArgs->C = y1 - k * x1;
 }
 
+QString Line::getDllModName() {
+    QString name("Line.dll");
+    return name;
+}
+
 /***************************************************************
  * 以下导出函数不能作为类的成员
  * *************************************************************/

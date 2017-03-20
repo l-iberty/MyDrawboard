@@ -72,6 +72,10 @@ void Rectangle::setP2(QPoint &point) {
     this->p2 = new QPoint(point);
 }
 
+QString Rectangle::getDllModName() {
+    QString name("Rectangle.dll");
+    return name;
+}
 
 /***************************************************************
  * 以下导出函数不能作为类的成员

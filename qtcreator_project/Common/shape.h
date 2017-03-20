@@ -19,6 +19,7 @@ public:
     virtual void setKeyP2(QPoint &point) = 0;
     virtual void setP1(QPoint &point) = 0;
     virtual void setP2(QPoint &point) = 0;
+    virtual QString getDllModName() = 0;
 };
 
 #endif // SHAPE_H

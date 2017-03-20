@@ -4,7 +4,21 @@
 #include <QtWidgets\qmenubar.h>
 #include <QtGui\qpen.h>
 #include <QtGui\qpainter.h>
+#include <Windows.h>
 #include "painter.h"
+#include "file.h"
+
+#ifndef PLUGIN_DIR
+#define PLUGIN_DIR ".\\plugins\\*"
+#endif
+
+#ifndef PROC_INSTANCE
+#define PROC_INSTANCE "?instance@@YAPAVShape@@XZ"
+#endif
+
+#ifndef PROC_GETDULSHAPEINSTANCE
+#define PROC_GETDULSHAPEINSTANCE "?getDulShapeInstance@@YAPAVShape@@AAV1@@Z"
+#endif
 
 MainWindow::MainWindow() {
 	setSize(700, 500);
@@ -31,12 +45,14 @@ void MainWindow::createMenusAndLoadplugins() {
 	fileGroup = new QActionGroup(this);
 	fileMenu->addAction(fileGroup->addAction(openFileAction));
 	fileMenu->addAction(fileGroup->addAction(saveFileAction));
+	connect(openFileAction, SIGNAL(triggered()), this, SLOT(openFile()));
+	connect(saveFileAction, SIGNAL(triggered()), this, SLOT(saveFile()));
 
 	// Picture 选项 (同时加载插件)
 	picMenu = menuBar()->addMenu(tr("Picture"));
 	picGroup = new QActionGroup(this);
 	
-	PluginLoader plugloader = PluginLoader(".\\plugins\\*");
+	PluginLoader plugloader = PluginLoader(PLUGIN_DIR);
 	dll_names = plugloader.getDllFileNames();
 	plugin_names = plugloader.getPluginNames();
 	
@@ -52,9 +68,9 @@ void MainWindow::createMenusAndLoadplugins() {
 		HMODULE hInstDll = LoadLibraryA(dll_names.at(i).c_str());
 		if (hInstDll != NULL) {
 			PPROC_INSTANCE proc_instance = (PPROC_INSTANCE)GetProcAddress(
-				hInstDll, "?instance@@YAPAVShape@@XZ");
+				hInstDll, PROC_INSTANCE);
 			PPROC_GETDULSHAPEINSTANCE proc_getDulShapeInstance = (PPROC_GETDULSHAPEINSTANCE)GetProcAddress(
-				hInstDll, "?getDulShapeInstance@@YAPAVShape@@AAV1@@Z");
+				hInstDll, PROC_GETDULSHAPEINSTANCE);
 			if (proc_instance && proc_getDulShapeInstance) {
 				proc_instance_list.push_back(proc_instance);
 				proc_getDulShapeInstance_list.push_back(proc_getDulShapeInstance);
@@ -201,4 +217,28 @@ void MainWindow::clear() {
 	shapeList.clear();
 	tempShapeList.clear();
 	repaint();
+}
+
+// slot function
+void MainWindow::saveFile() {
+	myFile = new File(shapeList);
+	if (myFile->save())
+		MessageBoxA(0, "File saved successfully!", "Save File", MB_OK);
+	else
+		MessageBoxA(0, "Cannot save file!", "ERROR", MB_OK);
+
+	delete myFile;
+}
+
+// slot function
+void MainWindow::openFile() {
+	myFile = new File(shapeList);
+	if (myFile->open()) {
+		shapeList = myFile->getFileData();
+		repaint();
+	}
+	else {
+		MessageBoxA(0, "Cannot open file!", "ERROR", MB_ICONERROR);
+	}
+	delete myFile;
 }

@@ -26,6 +26,7 @@ public:
     void setKeyP2(QPoint &point) override;
     void setP1(QPoint &point) override;
     void setP2(QPoint &point) override;
+    QString getDllModName() override;
 };
 
 #endif // LINE_H
