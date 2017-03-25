@@ -1,0 +1,12 @@
+#ifndef RECTANGLE_GLOBAL_H
+#define RECTANGLE_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(RECTANGLE_LIBRARY)
+#  define RECTANGLESHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define RECTANGLESHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // RECTANGLE_GLOBAL_H
