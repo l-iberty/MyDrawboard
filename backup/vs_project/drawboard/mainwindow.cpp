@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include <Windows.h>
+#include <assert.h>
+#include <typeinfo>
 //#include "file.h"
 
 MainWindow::MainWindow() {
@@ -11,18 +13,17 @@ MainWindow::MainWindow() {
 	m_pClearAction =		NULL;
 	m_pFileGroup =			NULL;
 	m_pPicGroup =			NULL;
-	m_CurProcNo = 			-1;
+	m_PluginNo = 			-1;
 	m_IsDragMode = 			false;
 	m_DragEnabled = 		false;
 	m_pMenuActionFactory =	NULL;
-	m_pPainter = 			NULL;
-	m_pPainterFactory = 	NULL;
+	m_pCurrentPainter = 			NULL;
 
 	resize(800, 560);
 	m_pMenuActionFactory = new MenuActionFactory();
 	createActions();
 	createMenus();
-	initPluginProcList();
+	initPlugins();
 }
 
 MainWindow::~MainWindow() {
@@ -35,12 +36,13 @@ MainWindow::~MainWindow() {
 	if (m_pFileGroup != NULL)			{ delete m_pFileGroup; }
 	if (m_pPicGroup != NULL)			{ delete m_pPicGroup; }
 	if (m_pMenuActionFactory != NULL)	{ delete m_pMenuActionFactory; }
-	if (m_pPainter != NULL)				{ delete m_pPainter; }
-	if (m_pPainterFactory != NULL)		{ delete m_pPainterFactory; }
+	if (m_pCurrentPainter != NULL)				{ delete m_pCurrentPainter; }
 
-	for (int i = 0;i < m_PluginActions.size();i++) {
-		if (m_PluginActions.at(i) != NULL) {
-			delete m_PluginActions.at(i);
+	assert(m_PluginActionList.size() == m_PainterList.size());
+	for (int i = 0;i < m_PluginActionList.size();i++) {
+		if (m_PluginActionList.at(i) && m_PainterList.at(i)) {
+			delete m_PluginActionList.at(i);
+			delete m_PainterList.at(i);
 		}
 	}
 }
@@ -55,7 +57,7 @@ void MainWindow::createActions() {
 	m_pSaveFileAction->setCheckable(true);
 	m_pDragAction->setCheckable(true);
 
-	connect(m_pOpenFileAction, SIGNAL(triggered()), this, SLOT(openFile()));
+	connect(m_pOpenFileAction, SIGNAL(triggered()), this, SLOT(readFile()));
 	connect(m_pSaveFileAction, SIGNAL(triggered()), this, SLOT(saveFile()));
 	connect(m_pDragAction, SIGNAL(triggered()), this, SLOT(setDragMode()));
 	connect(m_pClearAction, SIGNAL(triggered()), this, SLOT(clear()));
@@ -66,7 +68,7 @@ void MainWindow::createActions() {
 		action->setCheckable(true);
 		action->setData(i); // 设置编号
 		connect(action, SIGNAL(triggered()), this, SLOT(init()));
-		m_PluginActions.push_back(action);
+		m_PluginActionList.push_back(action);
 	}
 }
 
@@ -78,8 +80,8 @@ void MainWindow::createMenus() {
 
 	m_pPicMenu = menuBar()->addMenu(tr("Picture"));
 	m_pPicGroup = new QActionGroup(this);
-	for (int i = 0;i < m_PluginActions.size();i++) {
-		m_pPicMenu->addAction(m_pPicGroup->addAction(m_PluginActions.at(i)));
+	for (int i = 0;i < m_PluginActionList.size();i++) {
+		m_pPicMenu->addAction(m_pPicGroup->addAction(m_PluginActionList.at(i)));
 	}
 	m_pPicMenu->addSeparator();
 	m_pPicMenu->addAction(m_pPicGroup->addAction(m_pDragAction));
@@ -88,37 +90,51 @@ void MainWindow::createMenus() {
 }
 
 void MainWindow::paintEvent(QPaintEvent *evt) {
-	if (m_pPainter != NULL) {
-		m_pPainter->drawAllShapes(this);
-		m_pPainter->draw(this);
+	// 重绘之前绘制的图形
+	for (int i = 0;i < m_PainterList.size();i++) {
+		Painter *pPainter = m_PainterList.at(i);
+		if (pPainter != NULL) {
+			pPainter->drawAllShapes(this);
+		}
+	}
+	// 绘制当前图形
+	if (m_pCurrentPainter != NULL) {
+		m_pCurrentPainter->draw(this);
 	}
 }
 
 void MainWindow::mouseMoveEvent(QMouseEvent *evt) {
-	if (!m_IsDragMode) {
-		m_pPainter->handleMouseMovePoint(evt);
-	}
-	else {
-		if (m_DragEnabled) {
-			m_pPainter->setEndPoint(evt->pos());
-			m_pPainter->drag(this);
-			m_pPainter->setStartPoint(evt->pos());
+	if (m_pCurrentPainter != NULL) {
+		if (!m_IsDragMode) {
+			m_pCurrentPainter->handleMouseMovePoint(evt);
 		}
+		else {
+			if (m_DragEnabled) {
+				m_pCurrentPainter->setEndPoint(evt->pos());
+				m_pCurrentPainter->drag(this);
+				m_pCurrentPainter->setStartPoint(evt->pos());
+			}
+		}
+		repaint();
 	}
-	repaint();
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *evt) {
-	if (!m_IsDragMode) {
+	if (!m_IsDragMode && m_pCurrentPainter) { // 绘画模式
 		setMouseTracking(true);
-		m_pPainter->handleMousePressPoint(evt->pos());
+		m_pCurrentPainter->handleMousePressPoint(evt->pos());
 	}
-	else {
-		Shape *shape = m_pPainter->find(evt->pos());
-		if (shape != NULL) {
-			m_DragEnabled = true;
-			m_pPainter->setDraggingShape(shape);
-			m_pPainter->setStartPoint(evt->pos());
+	else { // 拖动模式
+		for (int i = 0;i < m_PainterList.size();i++) {
+			Painter *pPainter = m_PainterList.at(i);
+			Shape *pShape = pPainter->find(evt->pos());
+			if (pShape != NULL) {
+				m_DragEnabled = true;
+				m_pCurrentPainter = pPainter;
+				m_pCurrentPainter->setDraggingShape(pShape);
+				m_pCurrentPainter->setStartPoint(evt->pos());
+				break;
+			}
 		}
 	}
 }
@@ -129,40 +145,70 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *evt) {
 
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *evt) {
 	setMouseTracking(false);
-	m_pPainter->save();
+	if (m_pCurrentPainter != NULL) {
+		m_pCurrentPainter->save();
+		putCurrentPainter();
+	}
 }
 
-void MainWindow::initPluginProcList() {
+void MainWindow::initPlugins() {
 	PluginLoader pluginLoader;
 	QList<HMODULE> hModList = pluginLoader.getDllModList();
+
 	for (int i = 0;i < hModList.size();i++) {
 		PLUGIN_PROC PainterFactoryInstance = (PLUGIN_PROC)
 			GetProcAddress(hModList.at(i), "PainterFactoryInstance");
 		if (PainterFactoryInstance != NULL) {
 			m_PluginProcList.push_back(PainterFactoryInstance);
+			Painter *pPainter = PainterFactoryInstance()->createPainter();
+			if (pPainter != NULL) {
+				m_PainterList.push_back(pPainter);
+			}
 		}
 	}
 }
 
-PainterFactory* MainWindow::getPainterFactory(int i) {
-	PainterFactory* painterFactory = NULL;
-	if (!m_PluginProcList.isEmpty()) {
-		PLUGIN_PROC PainterFactoryInstance = m_PluginProcList.at(i);
-		painterFactory = PainterFactoryInstance();
+void MainWindow::putCurrentPainter() {
+	if (m_pCurrentPainter != NULL) {
+		if (!m_PainterList.contains(m_pCurrentPainter))
+			m_PainterList.push_back(m_pCurrentPainter);
 	}
-	return painterFactory;
+}
+
+void MainWindow::putPainter(Painter *pPainter) {
+	if (pPainter != NULL) {
+		if (!m_PainterList.contains(pPainter))
+			merge(pPainter);
+	}
+}
+
+// 来自插件 DLL 的 Painter 和来自文件的 Painter 都被放入 m_PainterList，
+// 但 m_PainterList 中不能存在指向相同的 Painter 子类类型的指针，因此
+// 需要进行合并.
+void MainWindow::merge(Painter *pPainter) {
+	char s1[MAX_PATH] = { 0 };
+	char s2[MAX_PATH] = { 0 };
+
+	pPainter->getFactoryFileName(s1);
+	for (int i = 0;i < m_PainterList.size();i++) {
+		m_PainterList.at(i)->getFactoryFileName(s2);
+		if (!strcmp(s1, s2)) { // pPainter 和 m_PainterList.at(i) 指向的 Painter 子类的类型相同吗?
+			delete m_PainterList.at(i);
+			m_PainterList.replace(i, pPainter);
+			break;
+		}
+	}
 }
 
 // slot function
 void MainWindow::init() {
 	m_IsDragMode = false;
 	setCursor(Qt::ArrowCursor);
+	m_pOpenFileAction->setDisabled(true); // 禁用菜单项 File->Open
 
 	QAction *actionTriggered = qobject_cast<QAction *>(sender());
-	m_CurProcNo = actionTriggered->data().toInt();
-
-	m_pPainterFactory = getPainterFactory(m_CurProcNo);
-	m_pPainter = m_pPainterFactory->createPainter();
+	m_PluginNo = actionTriggered->data().toInt();
+	m_pCurrentPainter = m_PainterList.at(m_PluginNo);
 }
 
 // slot function
@@ -174,35 +220,55 @@ void MainWindow::setDragMode() {
 // slot function
 void MainWindow::clear() {
 	m_IsDragMode = false;
-	m_pPainter->clearShapeList();
 	setCursor(Qt::ArrowCursor);
+
+	for (int i = 0;i < m_PainterList.size();i++) {
+		m_PainterList.at(i)->clearShapeList();
+	}
 	repaint();
 }
 
 // slot function
 void MainWindow::saveFile() {
-	/*myFile = new File(m_ShapeList);
-	if (myFile->save()) {
-		MessageBox(NULL, TEXT("File saved successfully!"), 
-			TEXT("Save File"), MB_OK);
+	File file;
+	Painter *pPainter = NULL;
+	FileDataEntry fde = { 0 };
+
+	for (int i = 0;i < m_PainterList.size();i++) {
+		pPainter = m_PainterList.at(i);
+		pPainter->getFactoryFileName(fde.szFileName);
+		QList<Shape*> shapeList = pPainter->getShapeList();
+		for (int k = 0;k < shapeList.size();k++) {
+			QVector<QPoint> points = shapeList.at(k)->getKeyPoints();
+			fde.pointsList.push_back(points);
+		}
+		file.save(&fde);
 	}
-	else {
-		MessageBox(NULL, TEXT("Cannot save file!"), 
-			TEXT("ERROR"), MB_ICONERROR);
-	}
-	delete myFile;*/
 }
 
 // slot function
-void MainWindow::openFile() {
-	/*myFile = new File(m_ShapeList);
-	if (myFile->open()) {
-		m_ShapeList = myFile->getFileData();
-		repaint();
+void MainWindow::readFile() {
+	File file;
+	Painter *pPainter = NULL;
+	FileDataEntry fde = { 0 };
+
+	file.read(&fde);
+
+	HMODULE hModule = GetModuleHandleA(fde.szFileName);
+	if (hModule != NULL) {
+		PLUGIN_PROC PainterFactoryInstance = (PLUGIN_PROC)
+			GetProcAddress(hModule, "PainterFactoryInstance");
+		if (PainterFactoryInstance != NULL) {
+			pPainter = PainterFactoryInstance()->createPainter();
+			if (pPainter != NULL) {
+				for (int i = 0;i < fde.pointsList.size();i++) {
+					QVector<QPoint> points = fde.pointsList.at(i);
+					pPainter->setDrawingShape(points);
+					pPainter->save();
+				}
+				putPainter(pPainter);
+			}
+		}
 	}
-	else {
-		MessageBox(NULL, TEXT("Cannot open file!"), 
-			TEXT("ERROR"), MB_ICONERROR);
-	}
-	delete myFile;*/
+	repaint();
 }

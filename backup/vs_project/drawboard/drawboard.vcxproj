@@ -77,6 +77,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="drawboard.cpp" />
+    <ClCompile Include="file.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_drawboard.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -129,6 +130,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="file.h" />
     <ClInclude Include="GeneratedFiles\ui_drawboard.h" />
     <ClInclude Include="menuactionfactory.h" />
     <ClInclude Include="painter.h" />

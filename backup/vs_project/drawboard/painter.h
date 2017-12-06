@@ -9,18 +9,21 @@ class Painter {
 public:
     Painter();
     virtual ~Painter();
+    virtual void getFactoryFileName(char *pszFileName) = 0;
     virtual void handleMouseMovePoint(QMouseEvent *evt);
     virtual void handleMousePressPoint(QPoint &point);
     virtual void draw(QPaintDevice *device) = 0;
     virtual void draw(Shape *shape, QPaintDevice *device) = 0;
-    virtual void drag(QPaintDevice *device);
-    virtual Shape* find(QPoint &point);
-    virtual void save();
+    void drag(QPaintDevice *device);
+    Shape* find(QPoint &point);
+    void save();
+    void setDrawingShape(QVector<QPoint>& keyPoints);
     void setDraggingShape(Shape *shape);
     void setStartPoint(QPoint &point);
     void setEndPoint(QPoint &point);
     QPoint& getStartPoint();
     QPoint& getEndPoint();
+    QList<Shape*>& getShapeList();
     Shape* getShapeListItem(int i);
     bool isEmptyShapeList();
     void clearShapeList();

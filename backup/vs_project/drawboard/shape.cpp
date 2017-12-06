@@ -8,7 +8,7 @@ Shape::~Shape() {
 
 }
 
-QVector<QPoint> Shape::getKeyPoints() {
+QVector<QPoint>& Shape::getKeyPoints() {
     return m_KeyPoints;
 }
 

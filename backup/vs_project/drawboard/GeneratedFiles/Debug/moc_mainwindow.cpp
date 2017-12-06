@@ -37,11 +37,11 @@ QT_MOC_LITERAL(2, 16, 0), // ""
 QT_MOC_LITERAL(3, 17, 11), // "setDragMode"
 QT_MOC_LITERAL(4, 29, 5), // "clear"
 QT_MOC_LITERAL(5, 35, 8), // "saveFile"
-QT_MOC_LITERAL(6, 44, 8) // "openFile"
+QT_MOC_LITERAL(6, 44, 8) // "readFile"
 
     },
     "MainWindow\0init\0\0setDragMode\0clear\0"
-    "saveFile\0openFile"
+    "saveFile\0readFile"
 };
 #undef QT_MOC_LITERAL
 
@@ -85,7 +85,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 1: _t->setDragMode(); break;
         case 2: _t->clear(); break;
         case 3: _t->saveFile(); break;
-        case 4: _t->openFile(); break;
+        case 4: _t->readFile(); break;
         default: ;
         }
     }

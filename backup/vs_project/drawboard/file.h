@@ -1,27 +1,24 @@
 #ifndef FILE_H
 #define FILE_H
 #include <vector>
+#include <Windows.h>
 #include "shape.h"
+#include <QVector>
+#include <QPoint>
 
+typedef struct _FileDataEntry {
+	char szFileName[MAX_PATH];
+	QVector<QVector<QPoint>> pointsList;
+} FileDataEntry;
 
 class File {
 public:
-	File(QList<Shape *> FileData);
+	File();
 	~File();
-
-	bool open();
-	bool save();
-	QList<Shape *> getFileData();
-
+	bool save(FileDataEntry *pFileDataEntry);
+	bool read(FileDataEntry *pFileDataEntry);
 private:
-	QFile *theFile;
-	QList<Shape *> FileData;
-
-	bool getKeyPoints(Shape *shape, int nPoints, int *x, int *y);
-	void writeFile(FILE *fp, char *DllModName, int nPoints, int *x, int *y);
-	bool parse(char *buf, char *DllModName, int *x, int *y);
-	int getPointNum(char *buf);
-	int getDllModNameLen(char *buf);
+	int newLine(FILE *_Stream);
 };
 
 #endif // FILE_H

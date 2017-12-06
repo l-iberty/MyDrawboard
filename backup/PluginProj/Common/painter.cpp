@@ -60,6 +60,12 @@ void Painter::save() {
     }
 }
 
+void Painter::setDrawingShape(QVector<QPoint> &keyPoints) {
+    if (m_pDrawingShape != NULL) {
+        m_pDrawingShape->setKeyPoints(keyPoints);
+    }
+}
+
 void Painter::setDraggingShape(Shape *shape) {
     m_pDraggingShape = shape;
 }
@@ -98,6 +104,10 @@ QPoint& Painter::getStartPoint() {
 
 QPoint& Painter::getEndPoint() {
     return m_EndPoint;
+}
+
+QList<Shape*>& Painter::getShapeList() {
+    return m_ShapeList;
 }
 
 Shape* Painter::getShapeListItem(int i) {

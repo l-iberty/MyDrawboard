@@ -3,12 +3,12 @@
 PluginLoader::PluginLoader() {
 	bool bSuccess = false;
 	
-	if (getDllFilePaths(PLUGIN_DIR, dll_paths)) { // get DLL paths
+	if (getDllFilePaths(PLUGIN_DIR, m_LibPaths)) { // get DLL paths
 		 // get DLL module handle
-		for (int i = 0;i < dll_paths.size();i++) {
-			HMODULE hMod = LoadLibraryA(dll_paths.at(i).c_str());
+		for (int i = 0;i < m_LibPaths.size();i++) {
+			HMODULE hMod = LoadLibraryA(m_LibPaths.at(i).c_str());
 			if (hMod != NULL) {
-				hModList.push_back(hMod);
+				m_HModList.push_back(hMod);
 			}
 		}
 		bSuccess = true;
@@ -19,8 +19,8 @@ PluginLoader::PluginLoader() {
 }
 
 PluginLoader::~PluginLoader() {
-	for (int i = 0;i < hModList.size();i++) {
-		FreeLibrary(hModList.at(i));
+	for (int i = 0;i < m_HModList.size();i++) {
+		FreeLibrary(m_HModList.at(i));
 	}
 }
 
@@ -44,16 +44,21 @@ bool PluginLoader::getDllFilePaths(char *path, vector<string> &paths) {
 }
 
 vector<string> PluginLoader::getPluginNames() {
-	for (int i = 0;i < dll_paths.size();i++) {
-		string s = dll_paths.at(i);
-		int start = s.find_last_of("\\") + 1;
-		int end = s.find_last_of(".");
-		s = s.substr(start, end - start);
-		plugin_names.push_back(s);
+	int numLibs = m_HModList.size();
+	char szName[MAX_PATH] = { 0 };
+
+	for (int i = 0;i < numLibs;i++) {
+		HMODULE hLibMod = m_HModList.at(i);
+		PLUGIN_PROC_NAME getPluginName = (PLUGIN_PROC_NAME)
+			GetProcAddress(hLibMod, "getPluginName");
+		if (getPluginName != NULL) {
+			getPluginName(szName);
+			m_PluginNames.push_back(szName);
+		}
 	}
-	return plugin_names;
+	return m_PluginNames;
 }
 
 QList<HMODULE> PluginLoader::getDllModList() {
-	return hModList;
+	return m_HModList;
 }

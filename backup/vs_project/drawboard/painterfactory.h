@@ -9,9 +9,6 @@ public:
     PainterFactory();
     virtual ~PainterFactory();
     virtual Painter* createPainter() = 0;
-private:
-    QPolygon* getQPolygon();
-    QPoint getMovingPoint();
 };
 
 #endif // PAINTER_FACTORY_H

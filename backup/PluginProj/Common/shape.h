@@ -7,7 +7,7 @@ class Shape {
 public:
     Shape();
     virtual ~Shape();
-    virtual QVector<QPoint> getKeyPoints();
+    virtual QVector<QPoint>& getKeyPoints();
     virtual void setKeyPoints(QVector<QPoint> &keyPoints);
     virtual void updateKeyPoints(int index, QPoint& point);
     virtual void removeLastKeyPoints();

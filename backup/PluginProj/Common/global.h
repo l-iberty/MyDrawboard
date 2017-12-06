@@ -1,8 +1,8 @@
-#ifndef DLL_EXPORT_H
-#define DLL_EXPORT_H
+#ifndef GLOBAL_H
+#define GLOBAL_H
 
 #define DLL_EXPORT extern "C" __declspec(dllexport)
 
 #pragma comment(lib, "user32")
 
-#endif // DLL_EXPORT_H
+#endif // GLOBAL_H

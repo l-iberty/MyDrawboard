@@ -10,7 +10,7 @@
 #include "painter.h"
 #include "painterfactory.h"
 #include "pluginloader.h"
-//#include "file.h"
+#include "file.h"
 
 typedef PainterFactory* (*PLUGIN_PROC)();
 
@@ -31,28 +31,30 @@ private:
 	void mouseMoveEvent(QMouseEvent *evt) override;
 	void mouseReleaseEvent(QMouseEvent *evt) override;
 	void mouseDoubleClickEvent(QMouseEvent *evt) override;
-	void initPluginProcList();
-	PainterFactory* getPainterFactory(int i);
+	void initPlugins();
+	void putCurrentPainter();
+	void putPainter(Painter *pPainter);
+	void merge(Painter *pPainter);
 private slots:
 	void init();
 	void setDragMode();
 	void clear(); // «Â∆¡
 	void saveFile();
-	void openFile();
+	void readFile();
 private:
 	// UI
 	QMenu *m_pFileMenu, *m_pPicMenu;
 	QAction *m_pOpenFileAction, *m_pSaveFileAction, *m_pDragAction, *m_pClearAction;
-	QList<QAction *> m_PluginActions;
+	QList<QAction *> m_PluginActionList;
 	QActionGroup *m_pFileGroup, *m_pPicGroup;
 	// Misc
 	QList<PLUGIN_PROC> m_PluginProcList;
-	int m_CurProcNo;
+	int m_PluginNo;
 	bool m_IsDragMode;
 	bool m_DragEnabled;
 	MenuActionFactory* m_pMenuActionFactory;
-	Painter* m_pPainter;
-	PainterFactory* m_pPainterFactory;
+	Painter* m_pCurrentPainter;
+	QList<Painter*> m_PainterList;
 };
 
 #endif // MAINWINDOW_H

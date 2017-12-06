@@ -1,4 +1,5 @@
 #include "polygonpainter.h"
+#include <string>
 
 PolygonPainter::PolygonPainter() {
     m_pShapeFactory = new PolygonFactory;
@@ -8,6 +9,12 @@ PolygonPainter::PolygonPainter() {
 
 PolygonPainter::~PolygonPainter() {
 
+}
+
+void PolygonPainter::getFactoryFileName(char *pszFileName) {
+    if (pszFileName != NULL) {
+        strcpy(pszFileName, "PolygonPainterFactory.DLL");
+    }
 }
 
 void PolygonPainter::handleMouseMovePoint(QMouseEvent *evt) {
