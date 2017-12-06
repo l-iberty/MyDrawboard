@@ -16,7 +16,8 @@ public:
 	File();
 	~File();
 	bool save(FileDataEntry *pFileDataEntry);
-	bool read(FileDataEntry *pFileDataEntry);
+	int read(FileDataEntry *pFileDataEntry, long offset);
+	long getFileSize(const char *pszFileName);
 private:
 	int newLine(FILE *_Stream);
 };

@@ -32,7 +32,6 @@ private:
 	void mouseReleaseEvent(QMouseEvent *evt) override;
 	void mouseDoubleClickEvent(QMouseEvent *evt) override;
 	void initPlugins();
-	void putCurrentPainter();
 	void putPainter(Painter *pPainter);
 	void merge(Painter *pPainter);
 private slots:

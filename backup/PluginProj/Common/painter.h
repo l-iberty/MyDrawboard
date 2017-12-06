@@ -10,8 +10,8 @@ public:
     Painter();
     virtual ~Painter();
     virtual void getFactoryFileName(char *pszFileName) = 0;
-    virtual void handleMouseMovePoint(QMouseEvent *evt);
-    virtual void handleMousePressPoint(QPoint &point);
+    virtual void handleMouseMovePoint(QMouseEvent *evt) = 0;
+    virtual void handleMousePressPoint(QPoint &point) = 0;
     virtual void draw(QPaintDevice *device) = 0;
     virtual void draw(Shape *shape, QPaintDevice *device) = 0;
     void drag(QPaintDevice *device);
@@ -34,7 +34,6 @@ protected:
 	QPoint m_StartPoint, m_EndPoint;
 	QList<Shape*> m_ShapeList;
 	ShapeFactory *m_pShapeFactory;
-private:
     void setModel();
 };
 

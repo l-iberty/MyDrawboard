@@ -14,8 +14,9 @@ public:
     virtual void addKeyPoints(QMouseEvent *evt);
     virtual void addKeyPoints(QPoint &point);
     virtual void clearKeyPoints();
-    virtual void setModel(QRect &model);
     virtual bool contains(QPoint &point) = 0;
+    void setModel(QRect &model);
+    QRect& getModel();
 protected:
     QRegion m_Region;
     QRect m_Model;

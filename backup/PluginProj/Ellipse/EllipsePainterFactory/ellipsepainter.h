@@ -1,21 +1,19 @@
-#ifndef POLYGON_PAINTER_H
-#define POLYGON_PAINTER_H
+#ifndef ELLIPSEPAINTER_H
+#define ELLIPSEPAINTER_H
 
-#include "polygon.h"
-#include "polygonfactory.h"
+#include "ellipse.h"
+#include "ellipsefactory.h"
 #include "../../Common/painter.h"
 
-class PolygonPainter :public MyPolygon, public Painter {
+class EllipsePainter :public MyEllipse, public Painter {
 public:
-    PolygonPainter();
-    ~PolygonPainter();
+    EllipsePainter();
+    ~EllipsePainter();
     void getFactoryFileName(char *pszFileName) override;
     void handleMouseMovePoint(QMouseEvent *evt) override;
     void handleMousePressPoint(QPoint &point) override;
     void draw(QPaintDevice *device) override;
     void draw(Shape *shape, QPaintDevice *device) override;
-private:
-    QPoint m_MovingPoint;
 };
 
-#endif // POLYGON_PAINTER_H
+#endif // ELLIPSEPAINTER_H

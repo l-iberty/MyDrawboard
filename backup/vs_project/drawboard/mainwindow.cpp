@@ -36,7 +36,7 @@ MainWindow::~MainWindow() {
 	if (m_pFileGroup != NULL)			{ delete m_pFileGroup; }
 	if (m_pPicGroup != NULL)			{ delete m_pPicGroup; }
 	if (m_pMenuActionFactory != NULL)	{ delete m_pMenuActionFactory; }
-	if (m_pCurrentPainter != NULL)				{ delete m_pCurrentPainter; }
+	if (m_pCurrentPainter != NULL)		{ delete m_pCurrentPainter; }
 
 	assert(m_PluginActionList.size() == m_PainterList.size());
 	for (int i = 0;i < m_PluginActionList.size();i++) {
@@ -147,7 +147,6 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *evt) {
 	setMouseTracking(false);
 	if (m_pCurrentPainter != NULL) {
 		m_pCurrentPainter->save();
-		putCurrentPainter();
 	}
 }
 
@@ -161,17 +160,9 @@ void MainWindow::initPlugins() {
 		if (PainterFactoryInstance != NULL) {
 			m_PluginProcList.push_back(PainterFactoryInstance);
 			Painter *pPainter = PainterFactoryInstance()->createPainter();
-			if (pPainter != NULL) {
+			if (pPainter != NULL)
 				m_PainterList.push_back(pPainter);
-			}
 		}
-	}
-}
-
-void MainWindow::putCurrentPainter() {
-	if (m_pCurrentPainter != NULL) {
-		if (!m_PainterList.contains(m_pCurrentPainter))
-			m_PainterList.push_back(m_pCurrentPainter);
 	}
 }
 
@@ -236,37 +227,49 @@ void MainWindow::saveFile() {
 
 	for (int i = 0;i < m_PainterList.size();i++) {
 		pPainter = m_PainterList.at(i);
-		pPainter->getFactoryFileName(fde.szFileName);
 		QList<Shape*> shapeList = pPainter->getShapeList();
-		for (int k = 0;k < shapeList.size();k++) {
-			QVector<QPoint> points = shapeList.at(k)->getKeyPoints();
-			fde.pointsList.push_back(points);
+		if (!shapeList.isEmpty()) {
+			pPainter->getFactoryFileName(fde.szFileName);
+			for (int k = 0;k < shapeList.size();k++) {
+				QVector<QPoint> points = shapeList.at(k)->getKeyPoints();
+				fde.pointsList.push_back(points);
+			}
+			file.save(&fde);
+			fde = { 0 };
 		}
-		file.save(&fde);
 	}
 }
 
 // slot function
 void MainWindow::readFile() {
 	File file;
-	Painter *pPainter = NULL;
-	FileDataEntry fde = { 0 };
+	FileDataEntry fde;
+	int cb = 0, cbTotal = 0;
+	
+	for (;;) {
+		fde = { 0 };
+		cb = file.read(&fde, cbTotal);
+		if (cb == 0) {
+			break;
+		}
+		else {
+			cbTotal += cb;
+		}
 
-	file.read(&fde);
-
-	HMODULE hModule = GetModuleHandleA(fde.szFileName);
-	if (hModule != NULL) {
-		PLUGIN_PROC PainterFactoryInstance = (PLUGIN_PROC)
-			GetProcAddress(hModule, "PainterFactoryInstance");
-		if (PainterFactoryInstance != NULL) {
-			pPainter = PainterFactoryInstance()->createPainter();
-			if (pPainter != NULL) {
-				for (int i = 0;i < fde.pointsList.size();i++) {
-					QVector<QPoint> points = fde.pointsList.at(i);
-					pPainter->setDrawingShape(points);
-					pPainter->save();
+		HMODULE hModule = GetModuleHandleA(fde.szFileName);
+		if (hModule != NULL) {
+			PLUGIN_PROC PainterFactoryInstance = (PLUGIN_PROC)
+				GetProcAddress(hModule, "PainterFactoryInstance");
+			if (PainterFactoryInstance != NULL) {
+				Painter *pPainter = PainterFactoryInstance()->createPainter();
+				if (pPainter != NULL) {
+					for (int i = 0;i < fde.pointsList.size();i++) {
+						QVector<QPoint> points = fde.pointsList.at(i);
+						pPainter->setDrawingShape(points);
+						pPainter->save();
+					}
+					putPainter(pPainter);
 				}
-				putPainter(pPainter);
 			}
 		}
 	}

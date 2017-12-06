@@ -99,9 +99,6 @@
     <ClInclude Include="GeneratedFiles\ui_drawboard.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="shape.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="pluginloader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -118,6 +115,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="painter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shape.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

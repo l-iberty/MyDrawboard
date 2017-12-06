@@ -21,6 +21,10 @@ void PolygonPainter::handleMouseMovePoint(QMouseEvent *evt) {
     m_MovingPoint = evt->pos();
 }
 
+void PolygonPainter::handleMousePressPoint(QPoint &point) {
+   m_pDrawingShape->addKeyPoints(point);
+}
+
 void PolygonPainter::draw(QPaintDevice *device) {
     QPoint NULLPOINT = QPoint(0, 0);
     bool isEqual = ((m_MovingPoint.rx() == NULLPOINT.rx()) &&

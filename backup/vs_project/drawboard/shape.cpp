@@ -14,6 +14,9 @@ QVector<QPoint>& Shape::getKeyPoints() {
 
 void Shape::setKeyPoints(QVector<QPoint> &keyPoints) {
     m_KeyPoints = keyPoints;
+    if (m_KeyPoints.size() == 2) {
+        m_Model = QRect(m_KeyPoints.first(), m_KeyPoints.last());
+    }
 }
 
 void Shape::updateKeyPoints(int index, QPoint &point) {
@@ -25,13 +28,7 @@ void Shape::removeLastKeyPoints() {
 }
 
 void Shape::addKeyPoints(QMouseEvent *evt) {
-    if (m_KeyPoints.size() <= 1) {
-        addKeyPoints(evt->pos());
-    }
-    else {
-        removeLastKeyPoints();
-        addKeyPoints(evt->pos());
-    }
+    addKeyPoints(evt->pos());
 }
 
 void Shape::addKeyPoints(QPoint &point) {
@@ -45,4 +42,8 @@ void Shape::clearKeyPoints() {
 void Shape::setModel(QRect &model) {
     m_Model.setTopLeft(model.topLeft());
 	m_Model.setBottomRight(model.bottomRight());
+}
+
+QRect& Shape::getModel() {
+    return m_Model;
 }
