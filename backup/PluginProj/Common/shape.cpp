@@ -15,7 +15,8 @@ QVector<QPoint>& Shape::getKeyPoints() {
 void Shape::setKeyPoints(QVector<QPoint> &keyPoints) {
     m_KeyPoints = keyPoints;
     if (m_KeyPoints.size() == 2) {
-        m_Model = QRect(m_KeyPoints.first(), m_KeyPoints.last());
+        QRect rect(m_KeyPoints.first(), m_KeyPoints.last());
+		setModel(rect);
     }
 }
 
@@ -40,8 +41,11 @@ void Shape::clearKeyPoints() {
 }
 
 void Shape::setModel(QRect &model) {
-    m_Model.setTopLeft(model.topLeft());
-	m_Model.setBottomRight(model.bottomRight());
+	QPoint pt1 = model.topLeft();
+	QPoint pt2 = model.bottomRight();
+	QPoint topLeft = (pt1.rx() < pt2.rx()) ? pt1 : pt2;
+	QPoint bottomRight = (pt1.rx() > pt2.rx()) ? pt1 : pt2;
+    m_Model = QRect(topLeft, bottomRight);
 }
 
 QRect& Shape::getModel() {

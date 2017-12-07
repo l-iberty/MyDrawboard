@@ -225,7 +225,7 @@ void MainWindow::saveFile() {
 	Painter *pPainter = NULL;
 	FileDataEntry fde = { 0 };
 
-	for (int i = 0;i < m_PainterList.size();i++) {
+	for (int i = 0;i < m_PainterList.size();i++, fde = { 0 }) {
 		pPainter = m_PainterList.at(i);
 		QList<Shape*> shapeList = pPainter->getShapeList();
 		if (!shapeList.isEmpty()) {
@@ -235,7 +235,6 @@ void MainWindow::saveFile() {
 				fde.pointsList.push_back(points);
 			}
 			file.save(&fde);
-			fde = { 0 };
 		}
 	}
 }
@@ -246,8 +245,7 @@ void MainWindow::readFile() {
 	FileDataEntry fde;
 	int cb = 0, cbTotal = 0;
 	
-	for (;;) {
-		fde = { 0 };
+	for (;;fde = { 0 }) {
 		cb = file.read(&fde, cbTotal);
 		if (cb == 0) {
 			break;

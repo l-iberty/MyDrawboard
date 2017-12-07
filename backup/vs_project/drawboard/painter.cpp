@@ -66,20 +66,7 @@ void Painter::setModel() {
     if (!m_pDrawingShape->getKeyPoints().isEmpty()) {
         QPoint pt1 = m_pDrawingShape->getKeyPoints().first();
         QPoint pt2 = m_pDrawingShape->getKeyPoints().last();
-
-        int x1 = pt1.rx();
-        int y1 = pt1.ry();
-        int x2 = pt2.rx();
-        int y2 = pt2.ry();
-
-        int topLX = min(x1, x2);
-        int topLY = min(y1, y2);
-        int bottomRX = max(x1, x2);
-        int bottomRY = max(y1, y2);
-
-        QPoint topLeft = QPoint(topLX, topLY);
-        QPoint bottomRight = QPoint(bottomRX, bottomRY);
-        QRect rect = QRect(topLeft, bottomRight);
+        QRect rect = QRect(pt1, pt2);
         m_pDrawingShape->setModel(rect);
     }
 }
