@@ -1,8 +1,6 @@
 #include "mainwindow.h"
 #include <Windows.h>
 #include <assert.h>
-#include <typeinfo>
-//#include "file.h"
 
 MainWindow::MainWindow() {
 	m_pFileMenu =			NULL;
@@ -39,10 +37,12 @@ MainWindow::~MainWindow() {
 	if (m_pCurrentPainter != NULL)		{ delete m_pCurrentPainter; }
 
 	assert(m_PluginActionList.size() == m_PainterList.size());
+	assert(m_PainterList.size() == m_PluginModuleList.size());
 	for (int i = 0;i < m_PluginActionList.size();i++) {
 		if (m_PluginActionList.at(i) && m_PainterList.at(i)) {
 			delete m_PluginActionList.at(i);
 			delete m_PainterList.at(i);
+			FreeLibrary(m_PluginModuleList.at(i));
 		}
 	}
 }
@@ -152,11 +152,11 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *evt) {
 
 void MainWindow::initPlugins() {
 	PluginLoader pluginLoader;
-	QList<HMODULE> hModList = pluginLoader.getDllModList();
+	m_PluginModuleList = pluginLoader.getDllModList();
 
-	for (int i = 0;i < hModList.size();i++) {
+	for (int i = 0;i < m_PluginModuleList.size();i++) {
 		PLUGIN_PROC PainterFactoryInstance = (PLUGIN_PROC)
-			GetProcAddress(hModList.at(i), "PainterFactoryInstance");
+			GetProcAddress(m_PluginModuleList.at(i), "PainterFactoryInstance");
 		if (PainterFactoryInstance != NULL) {
 			m_PluginProcList.push_back(PainterFactoryInstance);
 			Painter *pPainter = PainterFactoryInstance()->createPainter();
@@ -229,8 +229,10 @@ void MainWindow::saveFile() {
 		pPainter = m_PainterList.at(i);
 		QList<Shape*> shapeList = pPainter->getShapeList();
 		if (!shapeList.isEmpty()) {
+			// pPainter 由哪个 PainterFactory 创建?
 			pPainter->getFactoryFileName(fde.szFileName);
-			for (int k = 0;k < shapeList.size();k++) {
+			for (int k = 0;k < shapeList.size();k++) { // pPainter 一共画了多少个 Shape?
+				// 获取每个 Shape 的点集
 				QVector<QPoint> points = shapeList.at(k)->getKeyPoints();
 				fde.pointsList.push_back(points);
 			}
@@ -263,6 +265,8 @@ void MainWindow::readFile() {
 				if (pPainter != NULL) {
 					for (int i = 0;i < fde.pointsList.size();i++) {
 						QVector<QPoint> points = fde.pointsList.at(i);
+						// Painter::save()保存到m_ShapeList里的是m_pDrawingShape指向的Shape，
+						// 因此先调用Painter::setDrawingShape.
 						pPainter->setDrawingShape(points);
 						pPainter->save();
 					}

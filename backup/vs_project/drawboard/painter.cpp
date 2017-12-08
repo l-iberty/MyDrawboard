@@ -49,6 +49,8 @@ void Painter::save() {
         m_ShapeList.push_back(shapeCpy);
         delete m_pDrawingShape; // destory the old one
         m_pDrawingShape = m_pShapeFactory->createShape(); // create a new one
+        //m_ShapeList.push_back(m_pDrawingShape);
+        //m_pDrawingShape = m_pShapeFactory->createShape();
     }
 }
 
@@ -63,11 +65,10 @@ void Painter::setDraggingShape(Shape *shape) {
 }
 
 void Painter::setModel() {
-    if (!m_pDrawingShape->getKeyPoints().isEmpty()) {
+    if (m_pDrawingShape->getKeyPoints().size() == 2) {
         QPoint pt1 = m_pDrawingShape->getKeyPoints().first();
         QPoint pt2 = m_pDrawingShape->getKeyPoints().last();
-        QRect rect = QRect(pt1, pt2);
-        m_pDrawingShape->setModel(rect);
+        m_pDrawingShape->setModel(pt1, pt2);
     }
 }
 

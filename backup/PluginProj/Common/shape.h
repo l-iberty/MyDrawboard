@@ -15,7 +15,7 @@ public:
     virtual void addKeyPoints(QPoint &point);
     virtual void clearKeyPoints();
     virtual bool contains(QPoint &point) = 0;
-    void setModel(QRect &model);
+    void setModel(QPoint &pt1, QPoint &pt2);
     QRect& getModel();
 protected:
     QRegion m_Region;

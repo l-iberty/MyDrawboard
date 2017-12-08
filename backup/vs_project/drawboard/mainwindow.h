@@ -47,6 +47,7 @@ private:
 	QList<QAction *> m_PluginActionList;
 	QActionGroup *m_pFileGroup, *m_pPicGroup;
 	// Misc
+	QList<HMODULE> m_PluginModuleList;
 	QList<PLUGIN_PROC> m_PluginProcList;
 	int m_PluginNo;
 	bool m_IsDragMode;

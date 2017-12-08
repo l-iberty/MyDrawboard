@@ -22,17 +22,19 @@ bool File::save(FileDataEntry *pFileDataEntry) {
 
 	if ((pFile = fopen(DEFAULT_FILE, "ab")) != NULL) {
 		try {
+			// 保存插件DLL文件名
 			fprintf(pFile, "%s\n", pFileDataEntry->szFileName);
-
+			// 该插件DLL对应的Painter一共画了多少个Shape?
 			int numShapes = pFileDataEntry->pointsList.size();
 			fwrite(&numShapes, sizeof(numShapes), 1, pFile);
 			newLine(pFile);
 
-			for (int i = 0;i < numShapes;i++) {
+			for (int i = 0;i < numShapes;i++) { // 保存每个Shape的点集
 				QVector<QPoint> points = pFileDataEntry->pointsList.at(i);
-				int numPoints = points.size();
+				int numPoints = points.size(); // 点集里有多少个点?
 				fwrite(&numPoints, sizeof(numPoints), 1, pFile);
 				for (int n = 0;n < numPoints;n++) {
+					// 保存点集里的每个点
 					QPoint point = points.at(n);
 					fwrite(&point, sizeof(point), 1, pFile);
 				}
