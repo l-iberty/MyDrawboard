@@ -1,1 +1,0 @@
-cp shape* painter* C:/Users/len/github/MyDrawboard/1.4/vs_project/drawboard
