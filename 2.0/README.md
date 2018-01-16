@@ -46,3 +46,10 @@ m_pDrawingShape = m_pShapeFactory->createShape();
 
 拖动过程并未产生新的`Shape`，而是修改由`m_pCurrentPainter`修改自己的`m_ShapeList`中的某个`Shape`，重绘时会反映出来.
 
+----------
+
+## 如何制定exe图标？
+1. 在VS中新建资源文件(.rc)，并在`资源视图`下右键`Resource.rc`-`资源符号`->`新建`，输入`IDI_APPICON`. 添加`Icon`资源，导入准备好的`icon`文件，再使用其他文本编辑器打开`Resource.rc`和`resource.h`，将默认的资源符号`IDI_ICON1`删去或修改为`IDI_APPICON`.
+2. 选择菜单栏`QT5`->`Create basic .pro file`->不创建`.pri`文件->`Project tag`选择`Windows resource file`，完成.
+3. 在`.pro`文件末尾添加`RCC_FILE += Resource.rc`，重新生成即可.
+

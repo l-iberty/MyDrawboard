@@ -136,6 +136,7 @@
     <ClInclude Include="painter.h" />
     <ClInclude Include="painterfactory.h" />
     <ClInclude Include="pluginloader.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="shape.h" />
     <ClInclude Include="shapefactory.h" />
     <CustomBuild Include="mainwindow.h">
@@ -160,6 +161,12 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\qrc_%(Filename).cpp;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\rcc.exe" -name "%(Filename)" -no-compress "%(FullPath)" -o .\GeneratedFiles\qrc_%(Filename).cpp</Command>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\appicon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
