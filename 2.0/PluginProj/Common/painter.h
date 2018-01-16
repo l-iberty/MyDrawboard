@@ -4,6 +4,7 @@
 #include "shape.h"
 #include "shapefactory.h"
 #include <QtCore/QList>
+#include <QIcon>
 
 class Painter {
 public:

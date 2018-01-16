@@ -7,21 +7,18 @@ PluginLoader::PluginLoader() {
 		 // get DLL module handle
 		for (int i = 0;i < m_LibPaths.size();i++) {
 			HMODULE hMod = LoadLibraryA(m_LibPaths.at(i).c_str());
-			if (hMod != NULL) {
+			if (hMod != NULL)
 				m_HModList.push_back(hMod);
-			}
 		}
 		bSuccess = true;
 	}
-	if (!bSuccess) {
+	if (!bSuccess)
 		MessageBox(0, TEXT("Error loading plugins"), TEXT("ERROR"), MB_ICONERROR);
-	}
 }
 
 PluginLoader::~PluginLoader() {
-	for (int i = 0;i < m_HModList.size();i++) {
+	for (int i = 0;i < m_HModList.size();i++)
 		FreeLibrary(m_HModList.at(i));
-	}
 }
 
 bool PluginLoader::getDllFilePaths(char *path, vector<string> &paths) {
@@ -43,11 +40,10 @@ bool PluginLoader::getDllFilePaths(char *path, vector<string> &paths) {
 	return false;
 }
 
-vector<string> PluginLoader::getPluginNames() {
-	int numLibs = m_HModList.size();
+vector<string>& PluginLoader::getPluginNames() {
 	char szName[MAX_PATH] = { 0 };
 
-	for (int i = 0;i < numLibs;i++) {
+	for (int i = 0;i < m_HModList.size();i++) {
 		HMODULE hLibMod = m_HModList.at(i);
 		PLUGIN_PROC_NAME getPluginName = (PLUGIN_PROC_NAME)
 			GetProcAddress(hLibMod, "getPluginName");
@@ -59,6 +55,17 @@ vector<string> PluginLoader::getPluginNames() {
 	return m_PluginNames;
 }
 
-QList<HMODULE> PluginLoader::getDllModList() {
+vector<QIcon*>& PluginLoader::getPluginIcons() {
+	for (int i = 0;i < m_HModList.size();i++) {
+		HMODULE hLibMod = m_HModList.at(i);
+		PLUGIN_PROC_ICON getPluginIcon = (PLUGIN_PROC_ICON)
+			GetProcAddress(hLibMod, "getPluginIcon");
+		if (getPluginIcon != NULL)
+			m_PluginIcons.push_back(getPluginIcon());
+	}
+	return m_PluginIcons;
+}
+
+QList<HMODULE>& PluginLoader::getDllModList() {
 	return m_HModList;
 }

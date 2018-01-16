@@ -28,3 +28,6 @@ DLL_EXPORT PainterFactory* PainterFactoryInstance() {
     return painterFactory;
 }
 
+DLL_EXPORT QIcon* getPluginIcon() {
+    return new QIcon(QString(":/rectangle/rectangle.png"));
+}

@@ -27,3 +27,7 @@ DLL_EXPORT PainterFactory* PainterFactoryInstance() {
     PainterFactory* painterFactory = new CirclePainterFactory;
     return painterFactory;
 }
+
+DLL_EXPORT QIcon* getPluginIcon() {
+    return new QIcon(QString(":/circle/circle.png"));
+}

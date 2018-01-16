@@ -39,7 +39,7 @@ private slots:
 	void setDragMode();
 	void clear(); // «Â∆¡
 	void saveFile();
-	void readFile();
+	void openFile();
 private:
 	// UI
 	QMenu *m_pFileMenu, *m_pPicMenu;
@@ -47,12 +47,11 @@ private:
 	QList<QAction *> m_PluginActionList;
 	QActionGroup *m_pFileGroup, *m_pPicGroup;
 	// Misc
-	QList<HMODULE> m_PluginModuleList;
+	PluginLoader m_PluginLoader;
 	QList<PLUGIN_PROC> m_PluginProcList;
 	int m_PluginNo;
 	bool m_IsDragMode;
 	bool m_DragEnabled;
-	MenuActionFactory* m_pMenuActionFactory;
 	Painter* m_pCurrentPainter;
 	QList<Painter*> m_PainterList;
 };

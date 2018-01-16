@@ -14,11 +14,9 @@ MainWindow::MainWindow() {
 	m_PluginNo = 			-1;
 	m_IsDragMode = 			false;
 	m_DragEnabled = 		false;
-	m_pMenuActionFactory =	NULL;
 	m_pCurrentPainter = 			NULL;
 
 	resize(800, 560);
-	m_pMenuActionFactory = new MenuActionFactory();
 	createActions();
 	createMenus();
 	initPlugins();
@@ -33,16 +31,12 @@ MainWindow::~MainWindow() {
 	if (m_pClearAction != NULL)			{ delete m_pClearAction; }
 	if (m_pFileGroup != NULL)			{ delete m_pFileGroup; }
 	if (m_pPicGroup != NULL)			{ delete m_pPicGroup; }
-	if (m_pMenuActionFactory != NULL)	{ delete m_pMenuActionFactory; }
-	if (m_pCurrentPainter != NULL)		{ delete m_pCurrentPainter; }
 
 	assert(m_PluginActionList.size() == m_PainterList.size());
-	assert(m_PainterList.size() == m_PluginModuleList.size());
 	for (int i = 0;i < m_PluginActionList.size();i++) {
 		if (m_PluginActionList.at(i) && m_PainterList.at(i)) {
 			delete m_PluginActionList.at(i);
 			delete m_PainterList.at(i);
-			FreeLibrary(m_PluginModuleList.at(i));
 		}
 	}
 }
@@ -57,16 +51,23 @@ void MainWindow::createActions() {
 	m_pSaveFileAction->setCheckable(true);
 	m_pDragAction->setCheckable(true);
 
-	connect(m_pOpenFileAction, SIGNAL(triggered()), this, SLOT(readFile()));
+	m_pOpenFileAction->setIcon(QIcon(QString(":/drawboard/Resources/open.png")));
+	m_pSaveFileAction->setIcon(QIcon(QString(":/drawboard/Resources/save.png")));
+	m_pDragAction->setIcon(QIcon(QString(":/drawboard/Resources/drag.png")));
+	m_pClearAction->setIcon(QIcon(QString(":/drawboard/Resources/clear.png")));
+
+	connect(m_pOpenFileAction, SIGNAL(triggered()), this, SLOT(openFile()));
 	connect(m_pSaveFileAction, SIGNAL(triggered()), this, SLOT(saveFile()));
 	connect(m_pDragAction, SIGNAL(triggered()), this, SLOT(setDragMode()));
 	connect(m_pClearAction, SIGNAL(triggered()), this, SLOT(clear()));
 
-	int num = m_pMenuActionFactory->getMenuActionNum();
+	MenuActionFactory menuActionFactory = MenuActionFactory(m_PluginLoader);
+	int num = menuActionFactory.getMenuActionNum();
 	for (int i = 0;i < num;i++) {
-		QAction *action = m_pMenuActionFactory->createMenuAction(i, this);
+		QAction *action = menuActionFactory.createMenuAction(i, this);
 		action->setCheckable(true);
 		action->setData(i); // ÉèÖÃ±àºÅ
+		action->setIcon(*menuActionFactory.getMenuActionIcon(i));
 		connect(action, SIGNAL(triggered()), this, SLOT(init()));
 		m_PluginActionList.push_back(action);
 	}
@@ -151,12 +152,11 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *evt) {
 }
 
 void MainWindow::initPlugins() {
-	PluginLoader pluginLoader;
-	m_PluginModuleList = pluginLoader.getDllModList();
+	QList<HMODULE> pluginModuleList = m_PluginLoader.getDllModList();
 
-	for (int i = 0;i < m_PluginModuleList.size();i++) {
+	for (int i = 0;i < pluginModuleList.size();i++) {
 		PLUGIN_PROC PainterFactoryInstance = (PLUGIN_PROC)
-			GetProcAddress(m_PluginModuleList.at(i), "PainterFactoryInstance");
+			GetProcAddress(pluginModuleList.at(i), "PainterFactoryInstance");
 		if (PainterFactoryInstance != NULL) {
 			m_PluginProcList.push_back(PainterFactoryInstance);
 			Painter *pPainter = PainterFactoryInstance()->createPainter();
@@ -221,9 +221,12 @@ void MainWindow::clear() {
 
 // slot function
 void MainWindow::saveFile() {
-	File file;
 	Painter *pPainter = NULL;
 	FileDataEntry fde = { 0 };
+
+	QString name = QFileDialog::getSaveFileName();
+	name.replace(QChar('/'), QString("\\"));
+	File file(name, File::Save);
 
 	for (int i = 0;i < m_PainterList.size();i++, fde = { 0 }) {
 		pPainter = m_PainterList.at(i);
@@ -242,19 +245,20 @@ void MainWindow::saveFile() {
 }
 
 // slot function
-void MainWindow::readFile() {
-	File file;
+void MainWindow::openFile() {
 	FileDataEntry fde;
 	int cb = 0, cbTotal = 0;
+
+	QString name = QFileDialog::getOpenFileName();
+	name.replace(QChar('/'), QString("\\"));
+	File file(name, File::Open);
 	
 	for (;;fde = { 0 }) {
 		cb = file.read(&fde, cbTotal);
-		if (cb == 0) {
+		if (cb == 0)
 			break;
-		}
-		else {
+		else
 			cbTotal += cb;
-		}
 
 		HMODULE hModule = GetModuleHandleA(fde.szFileName);
 		if (hModule != NULL) {

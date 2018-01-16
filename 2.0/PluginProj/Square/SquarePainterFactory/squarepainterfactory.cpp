@@ -27,3 +27,7 @@ DLL_EXPORT PainterFactory* PainterFactoryInstance() {
     PainterFactory* painterFactory = new SquarePainterFactory;
     return painterFactory;
 }
+
+DLL_EXPORT QIcon* getPluginIcon() {
+    return new QIcon(QString(":/square/square.png"));
+}

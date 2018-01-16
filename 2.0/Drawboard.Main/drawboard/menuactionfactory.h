@@ -6,13 +6,14 @@
 
 class MenuActionFactory {
 public:
-	MenuActionFactory();
+	MenuActionFactory(PluginLoader &pluginLoader);
 	~MenuActionFactory();
 	QAction* createMenuAction(int type, QObject* parent);
+	QIcon* getMenuActionIcon(int type);
 	int getMenuActionNum();
 private:
 	vector<string> m_PluginNames;
-	PluginLoader* m_PluginLoader;
+	vector<QIcon*> m_PluginIcons;
 };
 
 #endif // MENUACTIONFACTORY_H

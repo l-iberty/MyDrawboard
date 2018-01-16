@@ -27,3 +27,7 @@ DLL_EXPORT PainterFactory* PainterFactoryInstance() {
     PainterFactory* painterFactory = new PolygonPainterFactory;
     return painterFactory;
 }
+
+DLL_EXPORT QIcon* getPluginIcon() {
+    return new QIcon(QString(":/polygon/polygon.png"));
+}
