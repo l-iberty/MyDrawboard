@@ -1,5 +1,5 @@
 # 画板
-一个简单的画图软件，来自[Bitman(工程组)](www.bitmen.org)的第一个课题，用于训练面向对象设计和插件式编程能力.
+一个简单的画图软件，来自[Bitman(工程组)](http://www.bitmen.org)的第一个课题，用于训练面向对象设计和插件式编程能力.
 
 ![](screenshot/drawboard.png)
 
