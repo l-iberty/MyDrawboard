@@ -32,7 +32,7 @@
 
 ## 4、绘制结束后的处理策略
 ### 法一：
-`MainWindow::m_pCurrentPainter`指向的`Painter`先让自己的`ShapeFactory`创建一个新的`Shape`，并将`m_pDrawinigShape`指向的`Shape`的关键信息拷贝给这个新`Shape`，再将指向新`Shape`的指针保存到`m_ShapeList`，其后销毁`m_pDrawingShape`指向`Shape`，最后再创建一个新的`Shape`，另m_pDrawingShape指向它.上述操作由`Painter::Save()`完成. 但是`Painter::save()`的关键代码其实可以简化为：
+`MainWindow::m_pCurrentPainter`指向的`Painter`先让自己的`ShapeFactory`创建一个新的`Shape`，并将`m_pDrawinigShape`指向的`Shape`的关键信息拷贝给这个新`Shape`，再将指向新`Shape`的指针保存到`m_ShapeList`，其后销毁`m_pDrawingShape`指向`Shape`，最后再创建一个新的`Shape`，令`m_pDrawingShape`指向它.上述操作由`Painter::save()`完成. 但是`Painter::save()`的关键代码其实可以简化为：
 
 ### 法二：
 ```
@@ -44,7 +44,7 @@ m_pDrawingShape = m_pShapeFactory->createShape();
 ## 5、拖动
 画板遍历`m_PainterList`，每个`Painter`遍历自己的`m_ShapeList`，找到需要被拖动的`Shape`后，画板将`m_pCurrentPainter`指向那个`Painter`，并设置该`Painter`的数据成员`m_pDraggingShape`指向`m_ShapeList`中需要被拖动的`Shape`. 此后这个`Painter`将根据鼠标轨迹实时修改`m_pDraggingShape`指向的`Shape`，并重绘之.
 
-拖动过程并未产生新的`Shape`，而是修改由`m_pCurrentPainter`修改自己的`m_ShapeList`中的某个`Shape`，重绘时会反映出来.
+拖动过程并未产生新的`Shape`，而是由`m_pCurrentPainter`修改自己的`m_ShapeList`中的某个`Shape`，重绘时会反映出来.
 
 ----------
 
