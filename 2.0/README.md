@@ -49,7 +49,14 @@ m_pDrawingShape = m_pShapeFactory->createShape();
 ----------
 
 ## 如何制定exe图标？
-1. 在VS中新建资源文件(.rc)，并在`资源视图`下右键`Resource.rc`-`资源符号`->`新建`，输入`IDI_APPICON`. 添加`Icon`资源，导入准备好的`icon`文件，再使用其他文本编辑器打开`Resource.rc`和`resource.h`，将默认的资源符号`IDI_ICON1`删去或修改为`IDI_APPICON`.
+## vs2015
+1. 在VS中新建资源文件(.rc)，并在`资源视图`下右键`Resource.rc`-`资源符号`->`新建`，输入`IDI_APPICON`. 添加`Icon`资源，导入准备好的`.ico`文件，再使用其他文本编辑器打开`Resource.rc`和`resource.h`，将默认的资源符号`IDI_ICON1`删去或修改为`IDI_APPICON`.
 2. 选择菜单栏`QT5`->`Create basic .pro file`->不创建`.pri`文件->`Project tag`选择`Windows resource file`，完成.
 3. 在`.pro`文件末尾添加`RCC_FILE += Resource.rc`，重新生成即可.
+
+## vs2013
+第一步与vs2015相同，完成后只需打开`Resource Files`下的`.qrc`文件，选择`Add File`，添加`.ico`文件即可.
+
+## 如何让窗口中的各种图标生效？
+打开`Resource Files`下的`.qrc`文件，选择`Add File`，添加相应的图片文件，即可让代码中的`setIcon()`、`setWindowIcon()`函数生效.
 
