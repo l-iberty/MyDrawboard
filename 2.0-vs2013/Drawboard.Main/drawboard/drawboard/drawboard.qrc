@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/drawboard">
+        <file>Resources/appicon.ico</file>
+        <file>Resources/appicon.png</file>
+        <file>Resources/clear.png</file>
+        <file>Resources/drag.png</file>
+        <file>Resources/open.png</file>
+        <file>Resources/save.png</file>
+    </qresource>
+</RCC>
