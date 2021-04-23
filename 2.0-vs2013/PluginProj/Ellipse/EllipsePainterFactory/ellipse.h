@@ -3,11 +3,11 @@
 
 #include "../../Common/shape.h"
 
-class MyEllipse :public Shape {
+class MyEllipse : public Shape {
 public:
-    MyEllipse();
-    ~MyEllipse();
-    bool contains(QPoint &point) override;
+  MyEllipse();
+  ~MyEllipse();
+  bool contains(QPoint &point) override;
 };
 
 #endif // ELLIPSE_H

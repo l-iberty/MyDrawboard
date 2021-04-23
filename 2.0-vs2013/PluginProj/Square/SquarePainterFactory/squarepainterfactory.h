@@ -4,11 +4,11 @@
 #include "../../Common/painterfactory.h"
 #include "squarepainter.h"
 
-class SquarePainterFactory: public PainterFactory {
+class SquarePainterFactory : public PainterFactory {
 public:
-    SquarePainterFactory();
-    ~SquarePainterFactory();
-    Painter* createPainter() override;
+  SquarePainterFactory();
+  ~SquarePainterFactory();
+  Painter *createPainter() override;
 };
 
 #endif // SQUAREPAINTERFACTORY_H

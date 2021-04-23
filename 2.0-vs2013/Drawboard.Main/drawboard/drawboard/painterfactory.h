@@ -6,9 +6,9 @@
 
 class PainterFactory {
 public:
-    PainterFactory();
-    virtual ~PainterFactory();
-    virtual Painter* createPainter() = 0;
+  PainterFactory();
+  virtual ~PainterFactory();
+  virtual Painter *createPainter() = 0;
 };
 
 #endif // PAINTER_FACTORY_H

@@ -3,11 +3,11 @@
 
 #include "../../Common/shape.h"
 
-class MyRectangle :public Shape {
+class MyRectangle : public Shape {
 public:
-    MyRectangle();
-    ~MyRectangle();
-    bool contains(QPoint &point) override;
+  MyRectangle();
+  ~MyRectangle();
+  bool contains(QPoint &point) override;
 };
 
 #endif // RECTANGLE_H

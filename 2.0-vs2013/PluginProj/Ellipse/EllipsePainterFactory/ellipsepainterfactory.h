@@ -4,11 +4,11 @@
 #include "../../Common/painterfactory.h"
 #include "ellipsepainter.h"
 
-class EllipsePainterFactory: public PainterFactory {
+class EllipsePainterFactory : public PainterFactory {
 public:
-    EllipsePainterFactory();
-    ~EllipsePainterFactory();
-    Painter* createPainter() override;
+  EllipsePainterFactory();
+  ~EllipsePainterFactory();
+  Painter *createPainter() override;
 };
 
 #endif // ELLIPSEPAINTERFACTORY_H

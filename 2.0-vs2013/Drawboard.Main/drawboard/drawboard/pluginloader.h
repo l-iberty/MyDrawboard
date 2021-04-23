@@ -1,35 +1,37 @@
-#ifndef PLUGINLOADER_H
+ï»¿#ifndef PLUGINLOADER_H
 #define PLUGINLOADER_H
 #define _CRT_SECURE_NO_WARINGS
+#include "shape.h"
+#include <Windows.h>
+#include <io.h>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <io.h>
-#include <Windows.h>
-#include "shape.h"
 
 using namespace std;
 
 #define PLUGIN_DIR ".\\plugins\\*"
 
 typedef void (*PLUGIN_PROC_NAME)(char *);
-typedef QIcon* (*PLUGIN_PROC_ICON)();
+typedef QIcon *(*PLUGIN_PROC_ICON)();
 
 class PluginLoader {
 public:
-	PluginLoader();
-	~PluginLoader();
-	vector<string>& getPluginNames();
-	vector<QIcon*>& getPluginIcons();
-	QList<HMODULE>& getDllModList();
+  PluginLoader();
+  ~PluginLoader();
+  vector<string> &getPluginNames();
+  vector<QIcon *> &getPluginIcons();
+  QList<HMODULE> &getDllModList();
+
 private:
-	bool getDllFilePaths(char *path, vector<string> &paths);
+  bool getDllFilePaths(char *path, vector<string> &paths);
+
 private:
-	vector<string> m_LibPaths; // DLL ÎÄ¼şµÄ¾ø¶ÔÂ·¾¶
-	vector<string> m_LibNames; // DLL ÎÄ¼şÃû, ²»º¬Â·¾¶
-	vector<string> m_PluginNames; // ²å¼şÃû
-	vector<QIcon*> m_PluginIcons; // ²å¼şÍ¼±ê
-	QList<HMODULE> m_HModList; // DLL Ä£¿é¾ä±ú
+  vector<string> m_LibPaths;     // DLL æ–‡ä»¶çš„ç»å¯¹è·¯å¾„
+  vector<string> m_LibNames;     // DLL æ–‡ä»¶å, ä¸å«è·¯å¾„
+  vector<string> m_PluginNames;  // æ’ä»¶å
+  vector<QIcon *> m_PluginIcons; // æ’ä»¶å›¾æ ‡
+  QList<HMODULE> m_HModList;     // DLL æ¨¡å—å¥æŸ„
 };
 
 #endif // PLUGINLOADER_H

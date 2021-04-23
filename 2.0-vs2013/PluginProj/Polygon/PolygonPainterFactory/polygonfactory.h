@@ -3,12 +3,12 @@
 
 #include "../../Common/shapefactory.h"
 
-class PolygonFactory :public ShapeFactory {
+class PolygonFactory : public ShapeFactory {
 public:
-    PolygonFactory();
-    ~PolygonFactory();
-    Shape* createShape() override;
-    Shape* createShape(Shape *shape) override;
+  PolygonFactory();
+  ~PolygonFactory();
+  Shape *createShape() override;
+  Shape *createShape(Shape *shape) override;
 };
 
 #endif // POLYGON_FACTORY_H

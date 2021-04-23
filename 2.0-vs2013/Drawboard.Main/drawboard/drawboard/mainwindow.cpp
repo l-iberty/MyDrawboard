@@ -1,283 +1,293 @@
-#include "mainwindow.h"
+Ôªø#include "mainwindow.h"
 #include <Windows.h>
 #include <assert.h>
 
 MainWindow::MainWindow() {
-	m_pFileMenu =			NULL;
-	m_pPicMenu =			NULL;
-	m_pOpenFileAction =		NULL;
-	m_pSaveFileAction =		NULL;
-	m_pDragAction =			NULL;
-	m_pClearAction =		NULL;
-	m_pFileGroup =			NULL;
-	m_pPicGroup =			NULL;
-	m_PluginNo = 			-1;
-	m_IsDragMode = 			false;
-	m_DragEnabled = 		false;
-	m_pCurrentPainter = 	NULL;
+  m_pFileMenu = NULL;
+  m_pPicMenu = NULL;
+  m_pOpenFileAction = NULL;
+  m_pSaveFileAction = NULL;
+  m_pDragAction = NULL;
+  m_pClearAction = NULL;
+  m_pFileGroup = NULL;
+  m_pPicGroup = NULL;
+  m_PluginNo = -1;
+  m_IsDragMode = false;
+  m_DragEnabled = false;
+  m_pCurrentPainter = NULL;
 
-	resize(800, 560);
-	createActions();
-	createMenus();
-	initPlugins();
+  resize(800, 560);
+  createActions();
+  createMenus();
+  initPlugins();
 }
 
 MainWindow::~MainWindow() {
-	if (m_pFileMenu != NULL)			{ delete m_pFileMenu; }
-	if (m_pPicMenu != NULL)				{ delete m_pPicMenu; }
-	if (m_pOpenFileAction != NULL)		{ delete m_pOpenFileAction; }
-	if (m_pSaveFileAction != NULL)		{ delete m_pSaveFileAction; }
-	if (m_pDragAction != NULL)			{ delete m_pDragAction; }
-	if (m_pClearAction != NULL)			{ delete m_pClearAction; }
-	if (m_pFileGroup != NULL)			{ delete m_pFileGroup; }
-	if (m_pPicGroup != NULL)			{ delete m_pPicGroup; }
+  if (m_pFileMenu != NULL) {
+    delete m_pFileMenu;
+  }
+  if (m_pPicMenu != NULL) {
+    delete m_pPicMenu;
+  }
+  if (m_pOpenFileAction != NULL) {
+    delete m_pOpenFileAction;
+  }
+  if (m_pSaveFileAction != NULL) {
+    delete m_pSaveFileAction;
+  }
+  if (m_pDragAction != NULL) {
+    delete m_pDragAction;
+  }
+  if (m_pClearAction != NULL) {
+    delete m_pClearAction;
+  }
+  if (m_pFileGroup != NULL) {
+    delete m_pFileGroup;
+  }
+  if (m_pPicGroup != NULL) {
+    delete m_pPicGroup;
+  }
 
-	assert(m_PluginActionList.size() == m_PainterList.size());
-	for (int i = 0;i < m_PluginActionList.size();i++) {
-		if (m_PluginActionList.at(i) && m_PainterList.at(i)) {
-			delete m_PluginActionList.at(i);
-			delete m_PainterList.at(i);
-		}
-	}
+  assert(m_PluginActionList.size() == m_PainterList.size());
+  for (int i = 0; i < m_PluginActionList.size(); i++) {
+    if (m_PluginActionList.at(i) && m_PainterList.at(i)) {
+      delete m_PluginActionList.at(i);
+      delete m_PainterList.at(i);
+    }
+  }
 }
 
 void MainWindow::createActions() {
-	m_pOpenFileAction = new QAction(tr("Open"), this);
-	m_pSaveFileAction = new QAction(tr("Save"), this);
-	m_pDragAction = new QAction(tr("Drag"), this);
-	m_pClearAction = new QAction(tr("Clear"), this);
+  m_pOpenFileAction = new QAction(tr("Open"), this);
+  m_pSaveFileAction = new QAction(tr("Save"), this);
+  m_pDragAction = new QAction(tr("Drag"), this);
+  m_pClearAction = new QAction(tr("Clear"), this);
 
-	m_pOpenFileAction->setCheckable(true);
-	m_pSaveFileAction->setCheckable(true);
-	m_pDragAction->setCheckable(true);
+  m_pOpenFileAction->setCheckable(true);
+  m_pSaveFileAction->setCheckable(true);
+  m_pDragAction->setCheckable(true);
 
-	m_pOpenFileAction->setIcon(QIcon(QString(":/drawboard/Resources/open.png")));
-	m_pSaveFileAction->setIcon(QIcon(QString(":/drawboard/Resources/save.png")));
-	m_pDragAction->setIcon(QIcon(QString(":/drawboard/Resources/drag.png")));
-	m_pClearAction->setIcon(QIcon(QString(":/drawboard/Resources/clear.png")));
+  m_pOpenFileAction->setIcon(QIcon(QString(":/drawboard/Resources/open.png")));
+  m_pSaveFileAction->setIcon(QIcon(QString(":/drawboard/Resources/save.png")));
+  m_pDragAction->setIcon(QIcon(QString(":/drawboard/Resources/drag.png")));
+  m_pClearAction->setIcon(QIcon(QString(":/drawboard/Resources/clear.png")));
 
-	connect(m_pOpenFileAction, SIGNAL(triggered()), this, SLOT(openFile()));
-	connect(m_pSaveFileAction, SIGNAL(triggered()), this, SLOT(saveFile()));
-	connect(m_pDragAction, SIGNAL(triggered()), this, SLOT(setDragMode()));
-	connect(m_pClearAction, SIGNAL(triggered()), this, SLOT(clear()));
+  connect(m_pOpenFileAction, SIGNAL(triggered()), this, SLOT(openFile()));
+  connect(m_pSaveFileAction, SIGNAL(triggered()), this, SLOT(saveFile()));
+  connect(m_pDragAction, SIGNAL(triggered()), this, SLOT(setDragMode()));
+  connect(m_pClearAction, SIGNAL(triggered()), this, SLOT(clear()));
 
-	MenuActionFactory menuActionFactory = MenuActionFactory(m_PluginLoader);
-	int num = menuActionFactory.getMenuActionNum();
-	for (int i = 0;i < num;i++) {
-		QAction *action = menuActionFactory.createMenuAction(i, this);
-		action->setCheckable(true);
-		action->setData(i); // …Ë÷√±‡∫≈
-		action->setIcon(*menuActionFactory.getMenuActionIcon(i));
-		connect(action, SIGNAL(triggered()), this, SLOT(init()));
-		m_PluginActionList.push_back(action);
-	}
+  MenuActionFactory menuActionFactory = MenuActionFactory(m_PluginLoader);
+  int num = menuActionFactory.getMenuActionNum();
+  for (int i = 0; i < num; i++) {
+    QAction *action = menuActionFactory.createMenuAction(i, this);
+    action->setCheckable(true);
+    action->setData(i); // ËÆæÁΩÆÁºñÂè∑
+    action->setIcon(*menuActionFactory.getMenuActionIcon(i));
+    connect(action, SIGNAL(triggered()), this, SLOT(init()));
+    m_PluginActionList.push_back(action);
+  }
 }
 
 void MainWindow::createMenus() {
-	m_pFileMenu = menuBar()->addMenu(tr("File"));
-	m_pFileGroup = new QActionGroup(this);
-	m_pFileMenu->addAction(m_pFileGroup->addAction(m_pOpenFileAction));
-	m_pFileMenu->addAction(m_pFileGroup->addAction(m_pSaveFileAction));
+  m_pFileMenu = menuBar()->addMenu(tr("File"));
+  m_pFileGroup = new QActionGroup(this);
+  m_pFileMenu->addAction(m_pFileGroup->addAction(m_pOpenFileAction));
+  m_pFileMenu->addAction(m_pFileGroup->addAction(m_pSaveFileAction));
 
-	m_pPicMenu = menuBar()->addMenu(tr("Picture"));
-	m_pPicGroup = new QActionGroup(this);
-	for (int i = 0;i < m_PluginActionList.size();i++) {
-		m_pPicMenu->addAction(m_pPicGroup->addAction(m_PluginActionList.at(i)));
-	}
-	m_pPicMenu->addSeparator();
-	m_pPicMenu->addAction(m_pPicGroup->addAction(m_pDragAction));
-	m_pPicMenu->addSeparator();
-	m_pPicMenu->addAction(m_pPicGroup->addAction(m_pClearAction));
+  m_pPicMenu = menuBar()->addMenu(tr("Picture"));
+  m_pPicGroup = new QActionGroup(this);
+  for (int i = 0; i < m_PluginActionList.size(); i++) {
+    m_pPicMenu->addAction(m_pPicGroup->addAction(m_PluginActionList.at(i)));
+  }
+  m_pPicMenu->addSeparator();
+  m_pPicMenu->addAction(m_pPicGroup->addAction(m_pDragAction));
+  m_pPicMenu->addSeparator();
+  m_pPicMenu->addAction(m_pPicGroup->addAction(m_pClearAction));
 }
 
 void MainWindow::paintEvent(QPaintEvent *evt) {
-	// ÷ÿªÊ÷Æ«∞ªÊ÷∆µƒÕº–Œ
-	for (int i = 0;i < m_PainterList.size();i++) {
-		Painter *pPainter = m_PainterList.at(i);
-		if (pPainter != NULL) {
-			pPainter->drawAllShapes(this);
-		}
-	}
-	// ªÊ÷∆µ±«∞Õº–Œ
-	if (m_pCurrentPainter != NULL) {
-		m_pCurrentPainter->draw(this);
-	}
+  // ÈáçÁªò‰πãÂâçÁªòÂà∂ÁöÑÂõæÂΩ¢
+  for (int i = 0; i < m_PainterList.size(); i++) {
+    Painter *pPainter = m_PainterList.at(i);
+    if (pPainter != NULL) {
+      pPainter->drawAllShapes(this);
+    }
+  }
+  // ÁªòÂà∂ÂΩìÂâçÂõæÂΩ¢
+  if (m_pCurrentPainter != NULL) {
+    m_pCurrentPainter->draw(this);
+  }
 }
 
 void MainWindow::mouseMoveEvent(QMouseEvent *evt) {
-	if (m_pCurrentPainter != NULL) {
-		if (!m_IsDragMode) {
-			m_pCurrentPainter->handleMouseMovePoint(evt);
-		}
-		else {
-			if (m_DragEnabled) {
-				m_pCurrentPainter->setEndPoint(evt->pos());
-				m_pCurrentPainter->drag(this);
-				m_pCurrentPainter->setStartPoint(evt->pos());
-			}
-		}
-		repaint();
-	}
+  if (m_pCurrentPainter != NULL) {
+    if (!m_IsDragMode) {
+      m_pCurrentPainter->handleMouseMovePoint(evt);
+    } else {
+      if (m_DragEnabled) {
+        m_pCurrentPainter->setEndPoint(evt->pos());
+        m_pCurrentPainter->drag(this);
+        m_pCurrentPainter->setStartPoint(evt->pos());
+      }
+    }
+    repaint();
+  }
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *evt) {
-	if (!m_IsDragMode && m_pCurrentPainter) { // ªÊª≠ƒ£ Ω
-		setMouseTracking(true);
-		m_pCurrentPainter->handleMousePressPoint(evt->pos());
-	}
-	else { // Õœ∂Øƒ£ Ω
-		for (int i = 0;i < m_PainterList.size();i++) {
-			Painter *pPainter = m_PainterList.at(i);
-			Shape *pShape = pPainter->find(evt->pos());
-			if (pShape != NULL) {
-				m_DragEnabled = true;
-				m_pCurrentPainter = pPainter;
-				m_pCurrentPainter->setDraggingShape(pShape);
-				m_pCurrentPainter->setStartPoint(evt->pos());
-				break;
-			}
-		}
-	}
+  if (!m_IsDragMode && m_pCurrentPainter) { // ÁªòÁîªÊ®°Âºè
+    setMouseTracking(true);
+    m_pCurrentPainter->handleMousePressPoint(evt->pos());
+  } else { // ÊãñÂä®Ê®°Âºè
+    for (int i = 0; i < m_PainterList.size(); i++) {
+      Painter *pPainter = m_PainterList.at(i);
+      Shape *pShape = pPainter->find(evt->pos());
+      if (pShape != NULL) {
+        m_DragEnabled = true;
+        m_pCurrentPainter = pPainter;
+        m_pCurrentPainter->setDraggingShape(pShape);
+        m_pCurrentPainter->setStartPoint(evt->pos());
+        break;
+      }
+    }
+  }
 }
 
-void MainWindow::mouseReleaseEvent(QMouseEvent *evt) {
-	m_DragEnabled = false;
-}
+void MainWindow::mouseReleaseEvent(QMouseEvent *evt) { m_DragEnabled = false; }
 
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *evt) {
-	setMouseTracking(false);
-	if (m_pCurrentPainter != NULL) {
-		m_pCurrentPainter->save();
-	}
+  setMouseTracking(false);
+  if (m_pCurrentPainter != NULL) {
+    m_pCurrentPainter->save();
+  }
 }
 
 void MainWindow::initPlugins() {
-	QList<HMODULE> pluginModuleList = m_PluginLoader.getDllModList();
+  QList<HMODULE> pluginModuleList = m_PluginLoader.getDllModList();
 
-	for (int i = 0;i < pluginModuleList.size();i++) {
-		PLUGIN_PROC PainterFactoryInstance = (PLUGIN_PROC)
-			GetProcAddress(pluginModuleList.at(i), "PainterFactoryInstance");
-		if (PainterFactoryInstance != NULL) {
-			m_PluginProcList.push_back(PainterFactoryInstance);
-			Painter *pPainter = PainterFactoryInstance()->createPainter();
-			if (pPainter != NULL)
-				m_PainterList.push_back(pPainter);
-		}
-	}
+  for (int i = 0; i < pluginModuleList.size(); i++) {
+    PLUGIN_PROC PainterFactoryInstance = (PLUGIN_PROC)GetProcAddress(pluginModuleList.at(i), "PainterFactoryInstance");
+    if (PainterFactoryInstance != NULL) {
+      m_PluginProcList.push_back(PainterFactoryInstance);
+      Painter *pPainter = PainterFactoryInstance()->createPainter();
+      if (pPainter != NULL)
+        m_PainterList.push_back(pPainter);
+    }
+  }
 }
 
 void MainWindow::putPainter(Painter *pPainter) {
-	if (pPainter != NULL) {
-		if (!m_PainterList.contains(pPainter))
-			merge(pPainter);
-	}
+  if (pPainter != NULL) {
+    if (!m_PainterList.contains(pPainter))
+      merge(pPainter);
+  }
 }
 
-// ¿¥◊‘≤Âº˛ DLL µƒ Painter ∫Õ¿¥◊‘Œƒº˛µƒ Painter ∂º±ª∑≈»Î m_PainterList£¨
-// µ´ m_PainterList ÷–≤ªƒ‹¥Ê‘⁄÷∏œÚœ‡Õ¨µƒ Painter ◊”¿‡¿‡–Õµƒ÷∏’Î£¨“Ú¥À
-// –Ë“™Ω¯––∫œ≤¢.
+// Êù•Ëá™Êèí‰ª∂ DLL ÁöÑ Painter ÂíåÊù•Ëá™Êñá‰ª∂ÁöÑ Painter ÈÉΩË¢´ÊîæÂÖ• m_PainterListÔºå
+// ‰ΩÜ m_PainterList ‰∏≠‰∏çËÉΩÂ≠òÂú®ÊåáÂêëÁõ∏ÂêåÁöÑ Painter Â≠êÁ±ªÁ±ªÂûãÁöÑÊåáÈíàÔºåÂõ†Ê≠§
+// ÈúÄË¶ÅËøõË°åÂêàÂπ∂.
 void MainWindow::merge(Painter *pPainter) {
-	char s1[MAX_PATH] = { 0 };
-	char s2[MAX_PATH] = { 0 };
+  char s1[MAX_PATH] = {0};
+  char s2[MAX_PATH] = {0};
 
-	pPainter->getFactoryFileName(s1);
-	for (int i = 0;i < m_PainterList.size();i++) {
-		m_PainterList.at(i)->getFactoryFileName(s2);
-		if (!strcmp(s1, s2)) { // pPainter ∫Õ m_PainterList.at(i) ÷∏œÚµƒ Painter ◊”¿‡µƒ¿‡–Õœ‡Õ¨¬?
-			delete m_PainterList.at(i);
-			m_PainterList.replace(i, pPainter);
-			break;
-		}
-	}
+  pPainter->getFactoryFileName(s1);
+  for (int i = 0; i < m_PainterList.size(); i++) {
+    m_PainterList.at(i)->getFactoryFileName(s2);
+    if (!strcmp(s1, s2)) { // pPainter Âíå m_PainterList.at(i) ÊåáÂêëÁöÑ Painter Â≠êÁ±ªÁöÑÁ±ªÂûãÁõ∏ÂêåÂêó?
+      delete m_PainterList.at(i);
+      m_PainterList.replace(i, pPainter);
+      break;
+    }
+  }
 }
 
 // slot function
 void MainWindow::init() {
-	m_IsDragMode = false;
-	setCursor(Qt::ArrowCursor);
-	m_pOpenFileAction->setDisabled(true); // Ω˚”√≤Àµ•œÓ File->Open
+  m_IsDragMode = false;
+  setCursor(Qt::ArrowCursor);
+  m_pOpenFileAction->setDisabled(true); // Á¶ÅÁî®ËèúÂçïÈ°π File->Open
 
-	QAction *actionTriggered = qobject_cast<QAction *>(sender());
-	m_PluginNo = actionTriggered->data().toInt();
-	m_pCurrentPainter = m_PainterList.at(m_PluginNo);
+  QAction *actionTriggered = qobject_cast<QAction *>(sender());
+  m_PluginNo = actionTriggered->data().toInt();
+  m_pCurrentPainter = m_PainterList.at(m_PluginNo);
 }
 
 // slot function
 void MainWindow::setDragMode() {
-	m_IsDragMode = true;
-	setCursor(Qt::ClosedHandCursor);
+  m_IsDragMode = true;
+  setCursor(Qt::ClosedHandCursor);
 }
 
 // slot function
 void MainWindow::clear() {
-	m_IsDragMode = false;
-	setCursor(Qt::ArrowCursor);
+  m_IsDragMode = false;
+  setCursor(Qt::ArrowCursor);
 
-	for (int i = 0;i < m_PainterList.size();i++) {
-		m_PainterList.at(i)->clearShapeList();
-	}
-	repaint();
+  for (int i = 0; i < m_PainterList.size(); i++) {
+    m_PainterList.at(i)->clearShapeList();
+  }
+  repaint();
 }
 
 // slot function
 void MainWindow::saveFile() {
-	Painter *pPainter = NULL;
-	FileDataEntry fde = { 0 };
+  Painter *pPainter = NULL;
+  FileDataEntry fde = {0};
 
-	QString name = QFileDialog::getSaveFileName();
-	name.replace(QChar('/'), QString("\\"));
-	File file(name, File::Save);
+  QString name = QFileDialog::getSaveFileName();
+  name.replace(QChar('/'), QString("\\"));
+  File file(name, File::Save);
 
-	for (int i = 0;i < m_PainterList.size();i++, fde = { 0 }) {
-		pPainter = m_PainterList.at(i);
-		QList<Shape*> shapeList = pPainter->getShapeList();
-		if (!shapeList.isEmpty()) {
-			// pPainter ”…ƒƒ∏ˆ PainterFactory ¥¥Ω®?
-			pPainter->getFactoryFileName(fde.szFileName);
-			for (int k = 0;k < shapeList.size();k++) { // pPainter “ªπ≤ª≠¡À∂‡…Ÿ∏ˆ Shape?
-				// ªÒ»°√ø∏ˆ Shape µƒµ„ºØ
-				QVector<QPoint> points = shapeList.at(k)->getKeyPoints();
-				fde.pointsList.push_back(points);
-			}
-			file.save(&fde);
-		}
-	}
+  for (int i = 0; i < m_PainterList.size(); i++, fde = {0}) {
+    pPainter = m_PainterList.at(i);
+    QList<Shape *> shapeList = pPainter->getShapeList();
+    if (!shapeList.isEmpty()) {
+      // pPainter Áî±Âì™‰∏™ PainterFactory ÂàõÂª∫?
+      pPainter->getFactoryFileName(fde.szFileName);
+      for (int k = 0; k < shapeList.size(); k++) { // pPainter ‰∏ÄÂÖ±Áîª‰∫ÜÂ§öÂ∞ë‰∏™ Shape?
+        // Ëé∑ÂèñÊØè‰∏™ Shape ÁöÑÁÇπÈõÜ
+        QVector<QPoint> points = shapeList.at(k)->getKeyPoints();
+        fde.pointsList.push_back(points);
+      }
+      file.save(&fde);
+    }
+  }
 }
 
 // slot function
 void MainWindow::openFile() {
-	FileDataEntry fde;
-	int cb = 0, cbTotal = 0;
+  FileDataEntry fde;
+  int cb = 0, cbTotal = 0;
 
-	QString name = QFileDialog::getOpenFileName();
-	name.replace(QChar('/'), QString("\\"));
-	File file(name, File::Open);
-	
-	for (;;fde = { 0 }) {
-		cb = file.read(&fde, cbTotal);
-		if (cb == 0)
-			break;
-		else
-			cbTotal += cb;
+  QString name = QFileDialog::getOpenFileName();
+  name.replace(QChar('/'), QString("\\"));
+  File file(name, File::Open);
 
-		HMODULE hModule = GetModuleHandleA(fde.szFileName);
-		if (hModule != NULL) {
-			PLUGIN_PROC PainterFactoryInstance = (PLUGIN_PROC)
-				GetProcAddress(hModule, "PainterFactoryInstance");
-			if (PainterFactoryInstance != NULL) {
-				Painter *pPainter = PainterFactoryInstance()->createPainter();
-				if (pPainter != NULL) {
-					for (int i = 0;i < fde.pointsList.size();i++) {
-						QVector<QPoint> points = fde.pointsList.at(i);
-						// Painter::save()±£¥ÊµΩm_ShapeList¿Ôµƒ «m_pDrawingShape÷∏œÚµƒShape£¨
-						// “Ú¥Àœ»µ˜”√Painter::setDrawingShape.
-						pPainter->setDrawingShape(points);
-						pPainter->save();
-					}
-					putPainter(pPainter);
-				}
-			}
-		}
-	}
-	repaint();
+  for (;; fde = {0}) {
+    cb = file.read(&fde, cbTotal);
+    if (cb == 0)
+      break;
+    else
+      cbTotal += cb;
+
+    HMODULE hModule = GetModuleHandleA(fde.szFileName);
+    if (hModule != NULL) {
+      PLUGIN_PROC PainterFactoryInstance = (PLUGIN_PROC)GetProcAddress(hModule, "PainterFactoryInstance");
+      if (PainterFactoryInstance != NULL) {
+        Painter *pPainter = PainterFactoryInstance()->createPainter();
+        if (pPainter != NULL) {
+          for (int i = 0; i < fde.pointsList.size(); i++) {
+            QVector<QPoint> points = fde.pointsList.at(i);
+            // Painter::save()‰øùÂ≠òÂà∞m_ShapeListÈáåÁöÑÊòØm_pDrawingShapeÊåáÂêëÁöÑShapeÔºå
+            // Âõ†Ê≠§ÂÖàË∞ÉÁî®Painter::setDrawingShape.
+            pPainter->setDrawingShape(points);
+            pPainter->save();
+          }
+          putPainter(pPainter);
+        }
+      }
+    }
+  }
+  repaint();
 }

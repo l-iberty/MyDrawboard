@@ -2,32 +2,26 @@
 #include "../../Common/global.h"
 #include <string>
 
-EllipsePainterFactory::EllipsePainterFactory() {
+EllipsePainterFactory::EllipsePainterFactory() {}
 
-}
+EllipsePainterFactory::~EllipsePainterFactory() {}
 
-EllipsePainterFactory::~EllipsePainterFactory() {
-
-}
-
-Painter* EllipsePainterFactory::createPainter() {
-    Painter *painter = new EllipsePainter;
-    return painter;
+Painter *EllipsePainterFactory::createPainter() {
+  Painter *painter = new EllipsePainter;
+  return painter;
 }
 
 //////////////////////// exported functions ////////////////////////
 
 DLL_EXPORT void getPluginName(char *pszName) {
-    if (pszName != NULL) {
-        strcpy(pszName, "Ellipse");
-    }
+  if (pszName != NULL) {
+    strcpy(pszName, "Ellipse");
+  }
 }
 
-DLL_EXPORT PainterFactory* PainterFactoryInstance() {
-    PainterFactory* painterFactory = new EllipsePainterFactory;
-    return painterFactory;
+DLL_EXPORT PainterFactory *PainterFactoryInstance() {
+  PainterFactory *painterFactory = new EllipsePainterFactory;
+  return painterFactory;
 }
 
-DLL_EXPORT QIcon* getPluginIcon() {
-    return new QIcon(QString(":/ellipse/ellipse.png"));
-}
+DLL_EXPORT QIcon *getPluginIcon() { return new QIcon(QString(":/ellipse/ellipse.png")); }

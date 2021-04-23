@@ -3,12 +3,12 @@
 
 #include "../../Common/shapefactory.h"
 
-class EllipseFactory :public ShapeFactory {
+class EllipseFactory : public ShapeFactory {
 public:
-    EllipseFactory();
-    ~EllipseFactory();
-    Shape* createShape() override;
-    Shape* createShape(Shape *shape) override;
+  EllipseFactory();
+  ~EllipseFactory();
+  Shape *createShape() override;
+  Shape *createShape(Shape *shape) override;
 };
 
 #endif // ELLIPSEFACTORY_H

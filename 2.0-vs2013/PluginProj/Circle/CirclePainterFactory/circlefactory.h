@@ -3,12 +3,12 @@
 
 #include "../../Common/shapefactory.h"
 
-class CircleFactory :public ShapeFactory {
+class CircleFactory : public ShapeFactory {
 public:
-    CircleFactory();
-    ~CircleFactory();
-    Shape* createShape() override;
-    Shape* createShape(Shape *shape) override;
+  CircleFactory();
+  ~CircleFactory();
+  Shape *createShape() override;
+  Shape *createShape(Shape *shape) override;
 };
 
 #endif // CIRCLEFACTORY_H
